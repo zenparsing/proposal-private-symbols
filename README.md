@@ -161,4 +161,4 @@ This proposal provides a missing capability to the language. A future proposal m
 - A new function is added for creating private symbols: `Symbol.private([description])`.
 - A new getter named `private` is added to `Symbol.prototype`, which returns the symbol's [[Private]] value.
 
-See [Specification Changes](spec-changes.md) for more info
+See [Specification Changes](spec-changes.md) for more details.
