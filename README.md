@@ -78,7 +78,7 @@ __*Why don't `Object.freeze` and `Object.seal` affect private symbol-keyed prope
 
 When an object is frozen or sealed, the object is first marked as non-extensible (meaning new properties cannot be added to it) and then a list of property keys is obtained by calling the object's `[[OwnPropertyKeys]]` internal method. That list is then used to mark properties as non-configurable (and non-writable in the case of `Object.freeze`).
 
-Since `[[OwnPropertyKeys]]` is not allowed to return private symbols, `freeze` and `seal` cannot modify those property definitions that are keyed with private symbols.
+Since `[[OwnPropertyKeys]]` is not allowed to return private symbols, `freeze` and `seal` cannot modify any property definitions that are keyed with private symbols.
 
 The fundamental idea is that only the code that has access to the private symbol is allowed to make changes to properties keyed by that symbol.
 
@@ -138,7 +138,7 @@ Boolean(Reflect.getOwnPropertyDescriptor(obj, sym)); // true
 Boolean(Reflect.getOwnPropertyDescriptor(proxy, sym)); // true
 ```
 
-The appropriate mechanism for branding already exists: `WeakSet`:
+The appropriate mechanism for branding already exists: `WeakSet`.
 
 ```js
 const brand = new WeakSet();
@@ -159,7 +159,7 @@ In general, it is not possible to provide static shape guarantees in JavaScript,
 
 __*Square brakets are ugly! Why doesn't this proposal include a more pleasant syntax?*__
 
-This proposal provides a missing capability to the language. A future proposal may provide syntactic sugar for symbol-keyed property definition and access. Hopefully such a syntactic feature would provide relief for both regular *and* private symbols.
+This proposal adds a missing capability to the language. A future proposal may provide syntactic sugar for symbol-keyed property definition and access. Hopefully such a syntactic feature would provide relief for both regular *and* private symbol usage.
 
 ## Semantics
 
