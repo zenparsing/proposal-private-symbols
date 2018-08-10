@@ -68,7 +68,7 @@ let c = new C();
 c[$m]();
 ```
 
-__*Why doesn't `Object.assign` and the spread operator copy private symbols?*__
+__*Why don't `Object.assign` and the spread operator copy private symbols?*__
 
 It follows from the definition of `Object.assign` and the spread operator.
 
