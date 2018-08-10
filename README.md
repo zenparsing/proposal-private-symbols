@@ -74,6 +74,16 @@ It follows from the definition of `Object.assign` and the spread operator.
 
 They both work by obtaining a list of property keys from the source object, using the `[[OwnPropertyKeys]]` internal method. Since we do not want to allow private symbols to leak, we restrict the definition of `[[OwnPropertyKeys]]` such that it is not allowed to return private symbols.
 
+__*Why don't `Object.freeze` and `Object.seal` affect private symbol-keyed properties?*__
+
+When an object is frozen or sealed, the object is first marked as non-extensible (meaning new properties cannot be added to it) and then a list of property keys is obtained by calling the object's `[[OwnPropertyKeys]]` internal method. That list is then used to mark properties as non-configurable (and non-writable in the case of `Object.freeze`).
+
+Since ``[[OwnPropertyKeys]]` is not allowed to return private symbols, `freeze` and `seal` cannot modify those property definitions that are keyed with private symbols.
+
+The fundamental idea is that only the code that has access to the private symbol is allowed to make changes to properties keyed by that symbol.
+
+This requires us to modify the definition of a "frozen" object: An object is "frozen" if it is non-configurable and all of it's own *non-private* properties are non-configurable and non-writable.
+
 __*How does this work with Proxies?*__
 
 Proxies are not able to intercept private symbols, and proxy handlers are not allowed to return any private symbols from the `ownKeys` trap.
