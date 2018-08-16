@@ -18,9 +18,16 @@ Add a clause specifying that well-known symbols have a [[Private]] value of **fa
 
 #### [[OwnPropertyKeys]] ( )
 
-Add the following item to the list of invariants:
+Modify the list of invariants:
 
+- The return value must be a List.
+- The returned list must not contain any duplicate entries.
+- The Type of each element of the returned List is either String or Symbol.
 - The returned list must not contain any symbols whose [[Private]] value is **true**.
+- The returned List must contain at least the keys of all non-configurable non-private own properties that have previously been observed.
+- If the object is non-extensible, the returned list must contain only the keys of all non-private own properties of the object that are observable using [[GetOwnProperty]].
+
+*The term "non-private own property" is not well-defined.*
 
 ### 9.1.11.1 OrdinaryOwnPropertyKeys ( _O_ )
 
@@ -62,6 +69,15 @@ Add after step 9:
 Add the following item to the note:
 
 - The returned List contains no Symbol values whose [[Private]] value is **true**.
+
+Modify note regarding invariants:
+
+- The result of [[OwnPropertyKeys]] is a List.
+- The returned List contains no duplicate entries.
+- The Type of each result List element is either String or Symbol.
+- The returned list must not contain any symbols whose [[Private]] value is **true**.
+- The result List must contain the keys of all non-configurable non-private own properties of the target object.
+- If the target object is not extensible, then the result List must contain all the keys of the non-private own properties of the target object and no other values.
 
 ## Changes to the Symbol API
 
