@@ -114,12 +114,13 @@ p.getData(); // 42
 
 __*How does this work with membranes?*__
 
-With membranes, we do not want to allow unmediated access to the wrapped objects "inside" of the membrane. Since proxy handlers are not called when presented with a private symbol, we have two choices:
+A membrane is a boundary between object graphs such that all access to objects "across" the boundary are required pass through the membrane's intercession mechanism. When an object "crosses" the boundary, it is wrapped in a proxy, and any objects reachable from that proxy are also wrapped in proxies.
 
-- We can choose to never let a private symbol pass through the membrane.
-- We can use a "shadow target" as the proxy target object, rather than the actual object inside of the membrane.
+<img src='./assets/membrane-shadow-target.svg' />
 
-If we use the "shadow target" approach, all private symbol access happens on the shadow target, and not the wrapped object.
+Any membrane that allows its proxies to return *stability guarantees* must use a "shadow target" to allow the Proxy API to uphold *object model invariants*. For instance, if a proxy reveals that it is non-extensible, then it must always report that it is non-extensible, and it may not in the future allow new properties to be added. To uphold these invariants, the Proxy API makes sure that values returned from proxy handlers are consistent with the shape of the target object. The "shadow target" acts as a record of the object model invariants that the proxy has committed to.
+
+When a private symbol is used on a membrane proxy, the proxy is bypassed and the operation is applied directly to the shadow target. As it turns out, the shadow target is an ideal store for private symbol-keyed properties: it is isolated from both "wet" and "dry" object graphs and access to it is revoked when a proxy is revoked. As long as the membrane uses the shadow target technique, private symbols cannot be used to bypass the membrane.
 
 __*Can private symbols be used for branding?*__
 
@@ -164,7 +165,7 @@ This proposal adds a missing capability to the language. A future proposal may p
 ## Semantics
 
 - Symbols have an additional internal value `[[Private]]`, which is either **true** or **false**. By definition, private symbols are symbols whose `[[Private]]` value is **true**.
-- The invariant of `[[OwnPropertyKeys]]` is modified such that it may not return any private symbols.
+- The invariants of `[[OwnPropertyKeys]]` are modified such that it may not return any private symbols.
 - The definition of `[[OwnPropertyKeys]]` for ordinary objects (and exotic objects other than proxy) is modified such that private symbols are filtered from the resulting array.
 - The proxy definition of `[[OwnPropertyKeys]]` is modified such that an error is thrown if the handler returns any private symbols.
 - The proxy definitions of all internal methods that accept property keys are modified such that if the provided key is a private symbol, then the operation is forwarded to the target without consulting the proxy handler.
