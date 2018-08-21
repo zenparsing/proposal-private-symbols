@@ -154,6 +154,8 @@ brand.has(proxy); // false
 
 As a user, sometimes you want data encapsulation, sometimes you want branding, and sometimes you want both. It is better to address these separate concerns with separate features.
 
+See [brandage](https://github.com/zenparsing/brandage) for a simple WeakSet subclass that can be used for easy object identity branding.
+
 __*Doesn't this proposal sacrifice "static shape" guarantees for private state?*__
 
 In general, it is not possible to provide static shape guarantees in JavaScript, nor is that a core language strength. It is the job of the JavaScript engine to infer static shape from the structure and behavior of the program at runtime.
