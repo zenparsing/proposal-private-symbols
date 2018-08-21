@@ -1,6 +1,16 @@
-import syntaxClassProps from '@babel/plugin-syntax-class-properties';
+const syntaxClassProps = require('@babel/plugin-syntax-class-properties').default;
 
-export default function({ types: t }) {
+/*
+
+This plugin converts all underscore-prefixed property names into computed
+property names where the property name expression evaluates to a generated
+private symbol.
+
+*/
+
+
+function underscoreToPrivatePlugin({ types: t }) {
+
   function getSymbolIdentifier(path, names) {
     let name = '';
     switch (path.node.type) {
@@ -8,35 +18,35 @@ export default function({ types: t }) {
       case 'StringLiteral': name = path.node.value; break;
     }
 
-    if (name.startsWith('_')) {
-      let ident = names.get(name);
-      if (ident) {
-        return t.identifier(ident.name);
-      }
-
-      let { scope } = path;
-      while (scope.parent) {
-        scope = scope.parent;
-      }
-
-      ident = scope.generateUidIdentifier(name);
-      names.set(name, ident);
-
-      scope.push({
-        id: t.identifier(ident.name),
-        init: t.callExpression(
-          t.memberExpression(
-            t.identifier('Symbol'),
-            t.identifier('private')
-          ),
-          [t.stringLiteral(name.slice(1))],
-        ),
-      });
-
-      return ident;
+    if (!name.startsWith('_')) {
+      return null;
     }
 
-    return null;
+    let symbolName = names.get(name);
+    if (symbolName) {
+      return t.identifier(symbolName);
+    }
+
+    let { scope } = path;
+    while (scope.parent) {
+      scope = scope.parent;
+    }
+
+    let ident = scope.generateUidIdentifier(name);
+    names.set(name, ident.name);
+
+    scope.push({
+      id: t.identifier(ident.name),
+      init: t.callExpression(
+        t.memberExpression(
+          t.identifier('Symbol'),
+          t.identifier('private')
+        ),
+        [t.stringLiteral(name.slice(1))],
+      ),
+    });
+
+    return ident;
   }
 
   function visitObjectMember(path, names) {
@@ -94,3 +104,5 @@ export default function({ types: t }) {
     },
   };
 }
+
+module.exports = underscoreToPrivatePlugin;
