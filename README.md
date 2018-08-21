@@ -118,9 +118,15 @@ A membrane is a boundary between object graphs such that all access to objects "
 
 <img src='./assets/membrane-shadow-target.svg' />
 
-Any membrane that allows its proxies to return *stability guarantees* must use a "shadow target" to allow the Proxy API to uphold *object model invariants*. For instance, if a proxy reveals that it is non-extensible, then it must always report that it is non-extensible, and it may not in the future allow new properties to be added. To uphold these invariants, the Proxy API makes sure that values returned from proxy handlers are consistent with the shape of the target object. The "shadow target" acts as a record of the object model invariants that the proxy has committed to.
+Any membrane that allows its proxies to return *stability guarantees* must use a "shadow target" to allow the Proxy API to uphold *object model invariants*. For instance, if a proxy reveals that it is non-extensible, then it must always report that it is non-extensible, and it may not in the future allow new properties to be added. To uphold these invariants, the Proxy API makes sure that values returned from proxy handlers are consistent with the shape of the proxy's target. The "shadow target" acts as a record of the object model invariants that the proxy has committed itself to.
 
-When a private symbol is used on a membrane proxy, the proxy is bypassed and the operation is applied directly to the shadow target. As it turns out, the shadow target is an ideal store for private symbol-keyed properties: it is isolated from both "wet" and "dry" object graphs and access to it is revoked when a proxy is revoked. As long as the membrane uses the shadow target technique, private symbols cannot be used to bypass the membrane.
+When a private symbol is used on a membrane proxy, the proxy is bypassed and the operation is applied directly to the shadow target. As it turns out, the shadow target is an ideal store for private symbol-keyed properties: it is isolated from both "wet" and "dry" object graphs and access to it is revoked when the membrane is revoked. As long as the membrane uses the shadow target technique, private symbols cannot be used to bypass the membrane.
+
+With the introduction of private symbols, the shadow target technique is transformed from a practical constriant into a necessary constraint for the implementation of secure membranes.
+
+Membranes are not transparent with respect to private symbols. Given some private symbol `p` shared by objects on both sides of the membrane, property access using `p` as a key will in general yield different results when applied to a membrane-proxy versus the object that it wraps. Properties that are keyed with private symbols are effectively isolated to the object graph in which they are used.
+
+Given that the primary use case for private symbols is property encapsulation at a module or package level, this limitation on the transparency of membranes seems acceptable.
 
 __*Can private symbols be used for branding?*__
 
