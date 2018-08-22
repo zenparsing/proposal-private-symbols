@@ -15,7 +15,7 @@ A **private symbol** is semantically identical to a regular symbol, with the fol
 - Private symbol-keyed properties are not affected by `Object.freeze` and `Object.seal`.
 - Private symbols are not exposed to proxy handlers.
 
-See [semantics](#semantics) for more details.
+See [Semantics](#semantics) for more details.
 
 Like regular symbols, private symbols may be created with a descriptive string:
 
@@ -169,6 +169,8 @@ In general, it is not possible to provide static shape guarantees in JavaScript,
 __*Square brakets are ugly! Why doesn't this proposal include a more pleasant syntax?*__
 
 This proposal adds a missing capability to the language. A future proposal may provide syntactic sugar for symbol-keyed property definition and access. Hopefully such a syntactic feature would provide sugar for both regular *and* private symbol usage.
+
+Another option is to use source-to-source transformation to convert property names with leading underscores into private symbol lookups. See [Babel Plugins](./babel-plugins) for an example.
 
 ## Semantics
 
