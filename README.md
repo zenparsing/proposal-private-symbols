@@ -172,6 +172,10 @@ This proposal adds a missing capability to the language. A future proposal may p
 
 Another option is to use source-to-source transformation to convert property names with leading underscores into private symbol lookups. See [Babel Plugins](./babel-plugins) for an example.
 
+__*Does this replace private class fields and methods?*__
+
+Yes. See [Private Symbols, or Private Fields](./symbols-or-fields.md).
+
 ## Semantics
 
 - Symbols have an additional internal value `[[Private]]`, which is either **true** or **false**. By definition, private symbols are symbols whose `[[Private]]` value is **true**.
