@@ -38,7 +38,7 @@ if (someSymbol.private) {
 This proposal is intended to provide a missing capability to JavaScript: the ability to add properties to an object that are inaccessible without a unique and unforgable key. Moreover, this proposal is intended to be *minimal*, completely *generalized* and strictly *orthogonal*.
 
 - It is *minimal* because it introduces the minimum amount of new concepts to the language.
-- It is *generalized* because it is not tied to any particlar type of object or syntactic structure.
+- It is *generalized* because it is not tied to any particular type of object or syntactic structure.
 - It is *orthogonal* because it does not attempt to solve any problem other than property encapsulation.
 
 The proposal **does not** attempt to provide solutions for:
@@ -114,15 +114,15 @@ p.getData(); // 42
 
 __*How does this work with membranes?*__
 
-A membrane is a boundary between object graphs such that all access to objects "across" the boundary are required pass through the membrane's intercession mechanism. When an object "crosses" the boundary, it is wrapped in a proxy, and any objects reachable from that proxy are also wrapped in proxies.
+A membrane is a boundary between object graphs such that all access to objects "across" the boundary are required to pass through the membrane's intercession mechanism. When an object "crosses" the boundary, it is wrapped in a proxy, and any objects reachable from that proxy are also wrapped in proxies.
 
 <img src='./assets/membrane-shadow-target.svg' />
 
-Any membrane that allows its proxies to return *stability guarantees* must use a "shadow target" to allow the Proxy API to uphold *object model invariants*. For instance, if a proxy reveals that it is non-extensible, then it must always report that it is non-extensible, and it may not in the future allow new properties to be added. To uphold these invariants, the Proxy API makes sure that values returned from proxy handlers are consistent with the shape of the proxy's target. The "shadow target" acts as a record of the object model invariants that the proxy has committed itself to.
+Any membrane that allows its proxies to return *stability guarantees* must use a "shadow target" to allow the Proxy API to uphold *object model invariants*. For instance, if a proxy reveals that it is non-extensible, then it must always report that it is non-extensible, and it may not in the future allow new properties to be added. To uphold these invariants, the Proxy API verifies that values returned from proxy handlers are consistent with the shape of the proxy's target. The "shadow target" acts as a record of the object model invariants that the proxy has committed itself to.
 
 When a private symbol is used on a membrane proxy, the proxy is bypassed and the operation is applied directly to the shadow target. As it turns out, the shadow target is an ideal store for private symbol-keyed properties: it is isolated from both "wet" and "dry" object graphs and access to it is revoked when the membrane is revoked. As long as the membrane uses the shadow target technique, private symbols cannot be used to bypass the membrane.
 
-With the introduction of private symbols, the shadow target technique is transformed from a practical constriant into a necessary constraint for the implementation of secure membranes.
+With the introduction of private symbols, the shadow target technique is transformed from a practical constraint into a necessary constraint for the implementation of secure membranes.
 
 Membranes are not transparent with respect to private symbols. Given some private symbol `p` shared by objects on both sides of the membrane, property access using `p` as a key will, in general, yield different results when applied to a membrane-proxy versus the object that it wraps. Properties that are keyed with private symbols are effectively isolated to the object graph in which they are used.
 
@@ -166,7 +166,7 @@ __*Doesn't this proposal sacrifice "static shape" guarantees for private state?*
 
 In general, it is not possible to provide static shape guarantees in JavaScript, nor is that a core language strength. It is the job of the JavaScript engine to infer static shape from the structure and behavior of the program at runtime.
 
-__*Square brakets are ugly! Why doesn't this proposal include a more pleasant syntax?*__
+__*Square brackets are ugly! Why doesn't this proposal include a more pleasant syntax?*__
 
 This proposal adds a missing capability to the language. A future proposal may provide syntactic sugar for symbol-keyed property definition and access. Hopefully such a syntactic feature would provide sugar for both regular *and* private symbol usage.
 
