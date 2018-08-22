@@ -10,7 +10,7 @@ A private state model based on private symbols has the following advantages over
 
 Unlike private fields, private symbols are not restricted to classes. In general, the language will be stronger if we do not create synthetic distinctions between objects created via class constructors and objects created any other way.
 
-Can private fields be extended to object literals in the future? Given that fields are lexically scoped, it is difficult to see how objects created via literals can share state without further complication of the private field model.
+Can private fields be extended to object literals in the future? Given that fields are lexically scoped, it is difficult to see how objects created via literals can share access to private state without further complication of the private field model.
 
 ## Better support for cooperative objects (friends)
 
@@ -20,13 +20,13 @@ With private symbols, friendship is trivial: we simply use the same private symb
 
 ## Better interaction with decorators
 
-Decorators and private fields are tightly bound: the decorator proposal must reify the private field as a novel map-like object, and private fields need decorators in order to satisfy the core use case of "friendship". Furthermore, decorator functions must be prepared to accept a "key" parameter that is not a valid property descriptor key.
+Decorators and private fields are tightly bound: the decorator proposal must reify the private field as a novel map-like object, and private fields need decorators in order to satisfy the core use case of "friendship". Furthermore, decorator functions must be prepared to accept a "key" parameter that is not actually a valid property key.
 
 Private symbols, on the other hand, simply flow through decorators just like any other symbol key. There are no special rules that must be applied to support private state.
 
 ## A simpler private state object model
 
-With private fields, users have to learn a new model of object state. They have to understand that for some kinds of "member names" prototype inheritance is applied, and for others it is not. They have to understand that for some kinds of names, proxies don't work, and for others they do. They have to understand that some names can throw a TypeError and others do not.
+With private fields, users have to learn a new model of object state. They have to understand that for some kinds of member names prototype inheritance is applied, and for others it is not. They have to understand that for some kinds of names, proxies don't work, and for others they do. They have to understand that some names can throw a TypeError and others do not.
 
 Private symbols do not require that the user learn anything new about the JavaScript object model. There are simply properties, and some of them can be hidden from reflection.
 
@@ -34,7 +34,7 @@ Private symbols do not require that the user learn anything new about the JavaSc
 
 Private methods introduce an interesting question regarding the mental model of private state. Given that methods can be getters or setters, are private methods "properties" or are they "values"? Is private state more property-like or WeakMap-like? How is a user supposed to think about this?
 
-Also, why is a method named with "#" installed on the instance, whereas a method named without a "#" is installed on the prototype?
+Also, why is a method named with "#" installed on the instance, whereas a method named without "#" is installed on the prototype?
 
 With private symbols there is nothing new to learn. Methods keyed with private symbols are regular properties installed on the prototype in the normal manner.
 
@@ -42,7 +42,7 @@ With private symbols there is nothing new to learn. Methods keyed with private s
 
 Private static fields introduce a well-known hazard: accessing a private static field through `this` will throw a `TypeError` if `this` is a subclass.
 
-Accessing a value using private symbols will traverse the prototype chain; the hazard disappears.
+When accessing a property using private symbols the prototype chain is traversed and the hazard disappears.
 
 ## Better interaction with simple wrapping proxies
 
