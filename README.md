@@ -56,16 +56,16 @@ Yes.
 Private symbols work just like regular symbols when it comes to prototype lookup. There is nothing new to learn. This means that "private methods" on classes just work, without any additional semantics:
 
 ```js
-const $m = Symbol.private();
+const method = Symbol.private();
 
 class C {
-  [$m]() {
+  [method]() {
     console.log('This is a private method, installed on the prototype');
   }
 }
 
 let c = new C();
-c[$m]();
+c[method]();
 ```
 
 __*Why don't `Object.assign` and the spread operator copy private symbols?*__
