@@ -130,11 +130,9 @@ It is not possible for a membrane to support both both privacy and transparency 
 
 __*Can private symbols be used for branding?*__
 
-No.
-
 The purpose of a branding mechanism is to mark objects such that, when presented with an arbitrary object, the code that created the "brand" can determine whether or not the object has been marked. In a typical scenario, objects are branded by constructor functions so that method invocations can check whether the `this` value is an object that was actually created by the constructor function.
 
-Private symbols are not appropriate for branding because a proxy can be used to transparently wrap an object. If the proxy target has a private symbol-keyed property, then the wrapping proxy will happily report that the proxy does as well:
+Simply testing for the presence of a private symbol-keyed property is not sufficient for branding because a proxy can be used to transparently wrap an object. If the proxy target has a private symbol-keyed property, then the wrapping proxy will happily report that the proxy does as well:
 
 ```js
 const sym = Symbol.private();
@@ -145,7 +143,24 @@ Boolean(Reflect.getOwnPropertyDescriptor(obj, sym)); // true
 Boolean(Reflect.getOwnPropertyDescriptor(proxy, sym)); // true
 ```
 
-The appropriate mechanism for branding already exists: `WeakSet`.
+Private symbols can be used for branding if we store the object reference as the property value:
+
+```js
+const sym = Symbol.private();
+
+function brand(x) { x[sym] = x }
+function isBranded(x) { return x[sym] === x }
+
+const obj = {};
+brand(obj);
+
+const proxy = new Proxy(obj, {});
+
+isBranded(obj); // true
+isBranded(proxy); // false
+```
+
+Alternatively, a `WeakSet` can be used:
 
 ```js
 const brand = new WeakSet();
@@ -158,9 +173,15 @@ brand.has(obj); // true
 brand.has(proxy); // false
 ```
 
-As a user, sometimes you want data encapsulation, sometimes you want branding, and sometimes you want both. It is better to address these separate concerns with separate features.
+__*Does the lack of automatic brand checking make code less secure?*__
 
-See [brandage](https://github.com/zenparsing/brandage) for a simple WeakSet subclass that can be used for easy object identity branding.
+Let's turn the question around: would automatic brand checking on access to private state make code *more* secure? Although automatic brand checking would help guard against malicious actors in a few simple scenarios, it is not sufficient for writing secure code. At a minimum, secure code must:
+
+- Execute in a trusted and frozen global environment.
+- Implement type guards on *all* inputs that are assumed to be trusted types.
+- Implement type guards that are executed before *any* other code is run.
+
+Automatic brand checking on access to private state seems like it helps make code more secure, but in reality leaves wide open cracks. It is better not to give the user false hope.
 
 __*Doesn't this proposal sacrifice "static shape" guarantees for private state?*__
 
@@ -171,6 +192,8 @@ __*Square brackets are ugly! Why doesn't this proposal include a more pleasant s
 This proposal adds a missing capability to the language. A future proposal may provide syntactic sugar for symbol-keyed property definition and access. Hopefully such a syntactic feature would provide sugar for both regular *and* private symbol usage.
 
 Another option is to use source-to-source transformation to convert property names with leading underscores into private symbol lookups. See [Babel Plugins](./babel-plugins) for an example.
+
+Furthermore, compile-to-JavaScript languages that support static type systems can use private symbols when generating code that accesses members declared with a `private` modifier.
 
 __*Does this replace private class fields and methods?*__
 
