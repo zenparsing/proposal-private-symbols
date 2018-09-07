@@ -92,3 +92,19 @@ let obj = {
 };
 
 `
+
+test`
+
+function F(_x) {
+  this._x = _x;
+}
+
+//==================
+
+var _x2 = Symbol.private("x");
+
+function F(_x) {
+  this[_x2] = _x;
+}
+
+`
