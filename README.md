@@ -49,7 +49,7 @@ The proposal **does not** attempt to provide solutions for:
 
 ## Some Questions and Answers
 
-__*Do objects inherit private symbols from their prototypes?*__
+### __*Do objects inherit private symbols from their prototypes?*__
 
 Yes.
 
@@ -68,13 +68,13 @@ let c = new C();
 c[method]();
 ```
 
-__*Why don't `Object.assign` and the spread operator copy private symbols?*__
+### __*Why don't `Object.assign` and the spread operator copy private symbols?*__
 
 It follows from the definition of `Object.assign` and the spread operator.
 
 They both work by obtaining a list of property keys from the source object, using the `[[OwnPropertyKeys]]` internal method. Since we do not want to allow private symbols to leak, we restrict the definition of `[[OwnPropertyKeys]]` such that it is not allowed to return private symbols.
 
-__*Why don't `Object.freeze` and `Object.seal` affect private symbol-keyed properties?*__
+### __*Why don't `Object.freeze` and `Object.seal` affect private symbol-keyed properties?*__
 
 When an object is frozen or sealed, the object is first marked as non-extensible (meaning new properties cannot be added to it) and then a list of property keys is obtained by calling the object's `[[OwnPropertyKeys]]` internal method. That list is then used to mark properties as non-configurable (and non-writable in the case of `Object.freeze`).
 
@@ -84,7 +84,7 @@ The fundamental idea is that only the code that has access to the private symbol
 
 This requires us to slightly modify the definition of a "frozen" object: An object is "frozen" if it is non-configurable and all of it's own *non-private* properties are non-configurable and non-writable.
 
-__*How does this work with Proxies?*__
+### __*How does this work with Proxies?*__
 
 Proxies are not able to intercept private symbols, and proxy handlers are not allowed to return any private symbols from the `ownKeys` trap.
 
@@ -112,7 +112,7 @@ c.getData(); // 42
 p.getData(); // 42
 ```
 
-__*How does this work with membranes?*__
+### __*How does this work with membranes?*__
 
 A membrane is a boundary between object graphs such that all access to objects "across" the boundary are required to pass through the membrane's intercession mechanism. When an object "crosses" the boundary, it is wrapped in a proxy, and any objects reachable from that proxy are also wrapped in proxies.
 
@@ -128,7 +128,7 @@ Membranes are not transparent with respect to private symbols. Given some privat
 
 It is not possible for a membrane to support both both privacy and transparency at the same time. If a membrane allows privacy, then it must reject transparency: operations involving private state must be isolated to their own object graph. If a membrane is perfectly transparent, then it cannot support privacy: operations involving supposedly "private" keys would have to be intercepted by, and leaked to, the proxy.
 
-__*Can private symbols be used for branding?*__
+### __*Can private symbols be used for branding?*__
 
 The purpose of a branding mechanism is to mark objects such that, when presented with an arbitrary object, the code that created the "brand" can determine whether or not the object has been marked. In a typical scenario, objects are branded by constructor functions so that method invocations can check whether the `this` value is an object that was actually created by the constructor function.
 
@@ -173,7 +173,7 @@ brand.has(obj); // true
 brand.has(proxy); // false
 ```
 
-__*Does the lack of automatic brand checking make code less secure?*__
+### __*Does the lack of automatic brand checking make code less secure?*__
 
 Let's turn the question around: would automatic brand checking on access to private state make code *more* secure? Although automatic brand checking would help guard against malicious actors in a few simple scenarios, it is not sufficient for writing secure code. At a minimum, secure code must:
 
@@ -183,11 +183,11 @@ Let's turn the question around: would automatic brand checking on access to priv
 
 Automatic brand checking on access to private state seems like it helps make code more secure, but in reality leaves wide open cracks. It is better not to give the user false hope.
 
-__*Doesn't this proposal sacrifice "static shape" guarantees for private state?*__
+### __*Doesn't this proposal sacrifice "static shape" guarantees for private state?*__
 
 In general, it is not possible to provide static shape guarantees in JavaScript, nor is that a core language strength. It is the job of the JavaScript engine to infer static shape from the structure and behavior of the program at runtime.
 
-__*Square brackets are ugly! Why doesn't this proposal include a more pleasant syntax?*__
+### __*Square brackets are ugly! Why doesn't this proposal include a more pleasant syntax?*__
 
 This proposal adds a missing capability to the language. A future proposal may provide syntactic sugar for symbol-keyed property definition and access. Hopefully such a syntactic feature would provide sugar for both regular *and* private symbol usage.
 
@@ -195,7 +195,7 @@ Another option is to use source-to-source transformation to convert property nam
 
 Furthermore, compile-to-JavaScript languages that support static type systems can use private symbols when generating code that accesses members declared with a `private` modifier.
 
-__*Does this replace private class fields and methods?*__
+### __*Does this replace private class fields and methods?*__
 
 Yes. See [Private Symbols, or Private Fields](./symbols-or-fields.md).
 
